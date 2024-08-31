@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            color: #333;
+            margin-top: 20px;
+        }
+
+        a {
+            display: block;
+            color: #007bff;
+            font-size: 1.5em;
+            margin-top: 20px;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        img {
+            margin-top: 30px;
+            max-width: 80%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<h1>Homepage</h1>
+<a href="{{ url_for('page1') }}">Entry1: Go to Page 1</a><br>
+<a href="{{ url_for('page2') }}">Entry1: Go to Page 2</a><br>
+<a href="{{ url_for('page3') }}">Entry2: Go to Page 3</a>
+
+<!-- Image below the links -->
+<img src="static/images/background.jpg" alt="Background Image">
+
+</body>
+</html>
