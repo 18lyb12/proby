@@ -1,7 +1,38 @@
 import os
 import pandas as pd
 
-from proby.shared_logger import shared_logger
+import threading
+import time
+
+from collections import deque
+from datetime import datetime
+
+
+class PredictionWithProgress:
+    def __init__(self):
+        self.stop_flag = threading.Event()
+
+    def print_wait_message(self, prefix):
+        while not self.stop_flag.is_set():
+            shared_logger.log(f"{prefix}, please wait...")  # Overwrite the line
+            time.sleep(5)  # Print every 5 seconds
+
+
+class SharedLogger:
+    def __init__(self, max_size=100):
+        self.log_messages = deque(maxlen=max_size)
+
+    def log(self, message):
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        log_entry = f'{timestamp} - {message}'
+        self.log_messages.append(log_entry)
+
+    def get_logs(self):
+        return list(self.log_messages)
+
+
+# Create a singleton instance of SharedLogger
+shared_logger = SharedLogger()
 
 
 def load_data(metadata):
@@ -39,3 +70,28 @@ def delete_files_in_folder(folder_path):
                 print(f"deleted {file_path}")
             except OSError as e:
                 print(f"error while deleting: {e}")
+
+
+zhuzhu_text = """
+~~~~~~~~~ PROBY ~~~~~~~~~
+⠀⠀⠀⠀⣠⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠀⠀⠀
+⠀⠀⠀⣰⠏⠈⠳⣤⡶⠷⠟⠻⠷⠶⢦⣄⣠⡴⠻⣷⠀⠀
+⠀⠀⢰⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⠛⠃⠀⠹⠆⠀
+⠀⠀⣼⠇⠀⠀⠀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠺⣧⠀⠀
+⠀⣾⠋⠀⠀⠀⠀⠿⠃⠀⠀⠀⣾⡆⠀⠀⠀⠀⠀⠹⣇⠀
+⢸⡇⠸⠳⠃⠀⠀⣠⣀⣤⣀⠀⠉⠁⠀⠀⠀⣤⢶⡄⢻⡆
+⠸⣧⠀⠀⠀⠀⢸⣏⠉⣼⢺⡟⢳⡄⠀⠀⠀⠈⠀⠀⣸⠇
+⠀⠘⠷⣦⣄⡀⠀⠙⠿⠿⠾⠟⠛⠁⠀⠀⠀⠀⠀⢠⡿⠀
+⠀⠀⠀⢀⡟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣤⣤⣴⠟⠁⠀
+⢀⣤⠾⢛⡁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣦⡀⠀⠀⠀⠀
+⣿⣥⡶⠟⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠙⣿⡀⠀⠀⠀
+⠀⠀⠀⠀⣿⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⣮⠑⠟⠃⠀⠀⠀
+⠀⠀⣠⡴⠿⠃⣠⣤⣤⣤⣄⣄⠀⠀⢠⡟⠀⠀⠀⠀⠀⠀
+⠀⠈⠿⠷⠾⠿⠟⠉⠁⠉⠛⠿⣿⣄⠙⢳⣄⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⠻⠿⠟⠀⠀⠀⠀⠀
+"""
+
+
+def plot_zhuzhu():
+    for line in zhuzhu_text.strip().split("\n"):
+        shared_logger.log(line)

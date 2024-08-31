@@ -1,18 +1,19 @@
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify
 import os
 import threading
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify
 from rdkit import Chem
 from rdkit.Chem import Draw
-from proby.util import delete_files_in_folder
+
 from proby.method1 import method1
 from proby.method2 import method2, interpret_model_15
-from proby.shared_logger import shared_logger
-
+from proby.util import delete_files_in_folder, plot_zhuzhu
+from proby.util import shared_logger
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'input'
 app.config['OUTPUT_FOLDER'] = 'output'
 log_messages = []
+
 
 # Function to log messages
 def log_message(message):
@@ -20,10 +21,12 @@ def log_message(message):
     if len(log_messages) > 100:
         log_messages.pop(0)
 
+
 # Route to handle homepage
 @app.route('/')
 def home():
     return render_template('index.html')
+
 
 # Route to handle Page 1
 @app.route('/page1', methods=['GET', 'POST'])
@@ -51,6 +54,7 @@ def page1():
     output_files = os.listdir(app.config['OUTPUT_FOLDER'])
     return render_template('page1.html', output_files=output_files)
 
+
 # Function to simulate file processing
 def process_files(method):
     shared_logger.log(f"Starting file processing with {method}...")
@@ -61,17 +65,22 @@ def process_files(method):
     else:
         method2(metadata)
 
-    shared_logger.log(f"File processing with {method} completed. PROBY!!!")
+    shared_logger.log(f"File processing with {method} completed.")
+    shared_logger.log("*** Refresh the page to download the processed files ***")
+    plot_zhuzhu()
+
 
 # Route to fetch the real-time log
 @app.route('/get_log', methods=['GET'])
 def get_log():
     return jsonify(shared_logger.get_logs())
 
+
 # Route to download output files
 @app.route('/download/<filename>')
 def download_file(filename):
     return send_from_directory(app.config['OUTPUT_FOLDER'], filename)
+
 
 # Route to handle Page 2
 @app.route('/page2', methods=['GET', 'POST'])
@@ -83,7 +92,7 @@ def page2():
             if not prop_delta:
                 prop_delta = 0.95
 
-            original_smiles, sub_smiles, rationale_score = interpret_model_15(smiles, prop_delta)
+            original_smiles, prediction_score, sub_smiles, rationale_score = interpret_model_15(smiles, prop_delta)
 
             img = Draw.MolsToGridImage([Chem.MolFromSmiles(original_smiles), Chem.MolFromSmiles(sub_smiles)],
                                        molsPerRow=2, subImgSize=(500, 500), legends=[original_smiles, sub_smiles],
@@ -93,12 +102,14 @@ def page2():
             image_path = os.path.join('static', 'images', 'interpret.png')
             img.save(image_path)
 
-            message = f"rationale_score {rationale_score}"
-            return render_template('page2.html', message=message, image_url=url_for('static', filename='images/interpret.png'))
+            message = f"prediction score: {prediction_score}, rationale score: {rationale_score}"
+            return render_template('page2.html', message=message,
+                                   image_url=url_for('static', filename='images/interpret.png'))
         except ValueError:
-            return render_template('page2.html', message="Invalid input. Please enter two numbers separated by a comma.")
+            return render_template('page2.html', message="Invalid input. Please enter a valid smiles.")
 
     return render_template('page2.html')
+
 
 # Route to handle Page 2
 @app.route('/page3', methods=['GET', 'POST'])
@@ -116,16 +127,20 @@ def page3():
             img.save(image_path)
 
             message = f"Generated distribution plot with Mean"
-            return render_template('page3.html', message=message, image_url=url_for('static', filename='images/distribution.png'))
+            return render_template('page3.html', message=message,
+                                   image_url=url_for('static', filename='images/distribution.png'))
         except ValueError:
-            return render_template('page3.html', message="Invalid input. Please enter two numbers separated by a comma.")
+            return render_template('page3.html',
+                                   message="Invalid input. Please enter two numbers separated by a comma.")
 
     return render_template('page3.html')
+
 
 # Route to go back to the homepage
 @app.route('/back_to_home')
 def back_to_home():
     return redirect(url_for('home'))
+
 
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)

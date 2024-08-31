@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
+    <title>Proby Homepage</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             height: 100vh;
             font-family: Arial, sans-serif;
-            text-align: center;
+            text-align: left; /* Align text to the left */
             background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         h1 {
@@ -19,30 +23,49 @@
             margin-top: 20px;
         }
 
-        a {
-            display: block;
-            color: #007bff;
-            font-size: 1.5em;
+        .link-container {
+            display: flex;
+            flex-direction: column; /* Stack links vertically */
+            align-items: flex-start; /* Align links to the left */
+            gap: 10px; /* Space between links */
             margin-top: 20px;
-            text-decoration: none;
+            padding-left: 20px; /* Space for the dots */
         }
 
-        a:hover {
+        .link-container a {
+            color: #007bff;
+            font-size: 1.5em;
+            text-decoration: none;
+            position: relative; /* Needed for the pseudo-element positioning */
+        }
+
+        .link-container a::before {
+            content: '•'; /* The dot character */
+            position: absolute;
+            left: -20px; /* Position the dot outside the link */
+            top: 50%; /* Vertically center the dot */
+            transform: translateY(-50%); /* Adjust vertical centering */
+            color: #007bff; /* Match the link color */
+        }
+
+        .link-container a:hover {
             text-decoration: underline;
         }
 
         img {
-            margin-top: 30px;
-            max-width: 80%;
+            margin-top: 20px;
+            max-width: 35%;
             height: auto;
         }
     </style>
 </head>
 <body>
-<h1>Homepage</h1>
-<a href="{{ url_for('page1') }}">Entry1: Go to Page 1</a><br>
-<a href="{{ url_for('page2') }}">Entry1: Go to Page 2</a><br>
-<a href="{{ url_for('page3') }}">Entry2: Go to Page 3</a>
+<h1>Proby Homepage</h1>
+<div class="link-container">
+    <a href="{{ url_for('page1') }}">Page 1: Predict Smiles from Files</a>
+    <a href="{{ url_for('page2') }}">Page 2: Identify Substructures</a>
+    <a href="{{ url_for('page3') }}">Page 3: Display Smiles</a>
+</div>
 
 <!-- Image below the links -->
 <img src="static/images/background.jpg" alt="Background Image">
