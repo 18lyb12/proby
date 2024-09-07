@@ -92,6 +92,9 @@ def page2():
             if not prop_delta:
                 prop_delta = 0.95
 
+            if not Chem.MolFromSmiles(smiles):
+                raise ValueError("Invalid input")
+
             original_smiles, prediction_score, sub_smiles, rationale_score = interpret_model_15(smiles, prop_delta)
 
             img = Draw.MolsToGridImage([Chem.MolFromSmiles(original_smiles), Chem.MolFromSmiles(sub_smiles)],
@@ -106,7 +109,7 @@ def page2():
             return render_template('page2.html', message=message,
                                    image_url=url_for('static', filename='images/interpret.png'))
         except ValueError:
-            return render_template('page2.html', message="Invalid input. Please enter a valid smiles.")
+            return render_template('page2.html', message="Invalid smiles. Please enter a valid smiles.")
 
     return render_template('page2.html')
 
@@ -119,6 +122,12 @@ def page3():
         try:
 
             smiles_list = text_input.split(",")
+
+            failed_smiles = [smiles for smiles in smiles_list if not Chem.MolFromSmiles(smiles)]
+            if failed_smiles:
+                message = f"{', '.join(failed_smiles)} {'is' if len(failed_smiles) == 1 else 'are'} invalid smiles. Please enter valid smiles separated by a comma."
+                raise ValueError(message)
+
             img = Draw.MolsToGridImage([Chem.MolFromSmiles(smiles) for smiles in smiles_list],
                                        molsPerRow=2, subImgSize=(500, 500), legends=smiles_list, returnPNG=False)
 
@@ -126,12 +135,12 @@ def page3():
             image_path = os.path.join('static', 'images', 'distribution.png')
             img.save(image_path)
 
-            message = f"Generated distribution plot with Mean"
+            message = f"Smiles Plot"
             return render_template('page3.html', message=message,
                                    image_url=url_for('static', filename='images/distribution.png'))
         except ValueError:
             return render_template('page3.html',
-                                   message="Invalid input. Please enter two numbers separated by a comma.")
+                                   message=message)
 
     return render_template('page3.html')
 

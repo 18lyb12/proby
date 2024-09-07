@@ -17,7 +17,9 @@
 </form>
 {% if message %}
 <h2>{{ message }}</h2>
+{% if image_url %}
 <img src="{{ image_url }}" alt="Smiles Plot">
+{% endif %}
 <br>
 {% endif %}
 <br>
