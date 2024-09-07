@@ -250,7 +250,7 @@ def generate_comprehensive_prediction(metadata):
                     #     if os.path.isfile(img_path):
                     #         cell = f'{col_letter}{idx + 2}'
                     #         worksheet[cell].hyperlink = hyperlink
-            shutil.copy(output_full_path, os.path.join(app_output_data_folder, f"method 1 processed {file_name}"))
+            shutil.copy(output_full_path, os.path.join(app_output_data_folder, f"[method 1] processed {file_name}"))
 
 
 def generate_report(metadata):
@@ -432,7 +432,7 @@ def generate_report(metadata):
     report_df.to_csv(report_path, index=False)
 
     app_output_data_folder = metadata["app_output_data_folder"]
-    shutil.copy(report_path, os.path.join(app_output_data_folder, "method 1 report.csv"))
+    shutil.copy(report_path, os.path.join(app_output_data_folder, "[method 1] report.csv"))
 
 
 def method1(metadata):
