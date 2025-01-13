@@ -1,0 +1,8 @@
+file_name,input_smiles,model_1_reported_smiles,model_1_reported_positive_smiles,model_1_reported_negative_smiles,model_1_not_reported_smiles,model_1_not_reported_positive_smiles,model_1_not_reported_negative_smiles,model_2_candidates_pairs,model_2_property_reported_pairs,model_2_property_not_reported_pairs
+test_data2.xlsx,11,0,0,0,11,1,10,22,0,22
+.DS_Store,0,0,0,0,0,0,0,0,0,0
+266-smiles-20240619.xlsx,264,0,0,0,264,7,257,154,0,154
+model_1_266-smiles-20240619.xlsx,264,0,0,0,264,7,257,154,0,154
+test_data.xlsx,10,0,0,0,10,1,9,22,0,22
+test_data1.xlsx,11,0,0,0,11,1,10,22,0,22
+all,264,0,0,0,264,7,257,154,0,154
