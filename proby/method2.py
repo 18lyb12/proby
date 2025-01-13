@@ -11,14 +11,14 @@ from proby.util import PredictionWithProgress, get_smiles, load_data, shared_log
 
 # Get the absolute path of the directory containing the current file
 current_file_path = Path(__file__).resolve()
-current_folder_path = current_file_path.parent
+root_folder_path = current_file_path.parent
 
 # model
-model_15_dir = os.path.join(current_folder_path, 'models/model_1.5')
-model_2_dir = os.path.join(current_folder_path, 'models/model_2')
+model_15_dir = os.path.join(root_folder_path, 'models/model_1.5')
+model_2_dir = os.path.join(root_folder_path, 'models/model_2')
 
 # common
-common_data_folder = os.path.join(current_folder_path, "data/common")
+common_data_folder = os.path.join(root_folder_path, "data/common")
 
 ## model 1.5
 reported_smiles_signal_path = os.path.join(common_data_folder, 'reported_smiles_signal.csv')
@@ -29,13 +29,13 @@ scale_parameters_path = os.path.join(common_data_folder, 'scale_parameters.json'
 reported_active_smiles_properties_path = os.path.join(common_data_folder, 'reported_active_smiles_properties.csv')
 
 # input
-# input_data_folder = os.path.join(current_folder_path, "data/input")
+# input_data_folder = os.path.join(root_folder_path, "data/prediction_data/input")
 
 # smiles inventory
-smiles_inventory_folder = os.path.join(current_folder_path, "data/smiles_inventory")
+smiles_inventory_folder = os.path.join(root_folder_path, "data/prediction_data/smiles_inventory")
 
 # intermediate
-intermediate_data_folder = os.path.join(current_folder_path, "data/intermediate")
+intermediate_data_folder = os.path.join(root_folder_path, "data/prediction_data/intermediate")
 
 ## model 1.5
 model_15_data_path = os.path.join(intermediate_data_folder, 'model_1.5_data.csv')
@@ -50,7 +50,7 @@ model_2_single_data_path = os.path.join(intermediate_data_folder, "model_2_singl
 model_2_scaled_single_preds = os.path.join(intermediate_data_folder, 'model_2_scaled_single_preds.csv')
 
 # output
-output_data_folder = os.path.join(current_folder_path, "data/output2")
+output_data_folder = os.path.join(root_folder_path, "data/prediction_data/output2")
 
 ## model 1.5
 model_15_preds_path = os.path.join(output_data_folder, 'model_1.5_preds.csv')
