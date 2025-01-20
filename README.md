@@ -1,4 +1,5 @@
 # Proby
+![logo](static/images/zhuzhu.png)
 
 ## Data Preprocessing
 TODO
