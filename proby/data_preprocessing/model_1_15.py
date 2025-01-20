@@ -65,8 +65,9 @@ def process_download_human_data(processed_data):
     absorption_emission_pairs = processed_data["absorption_emission_pairs"]
     file_path = os.path.join(raw_data_folder, "下载数据+人工整理.xlsx")
     xls = pd.ExcelFile(file_path)
+    plt.figure()
     download_human_data_dfs = []
-    for sheet_name in xls.sheet_names:  # 遍历
+    for sheet_name in xls.sheet_names:
         print(f"processing {sheet_name} ...")
         download_human_data_df = pd.read_excel(xls, sheet_name)
         download_human_data_df["id"] = download_human_data_df.index
@@ -84,7 +85,7 @@ def process_download_human_data(processed_data):
         plt.scatter(download_human_data_df['absorption_max'], download_human_data_df['emission_max'], alpha=0.1,
                     label=sheet_name)
 
-    with open(os.path.join(common_data_folder, "common_absorption_emission_pairs_temp.json"), 'w') as json_file:
+    with open(os.path.join(common_data_folder, "common_absorption_emission_pairs.json"), 'w') as json_file:
         common_absorption_emission_pairs = [pair for pair, freq in Counter(absorption_emission_pairs).most_common() if
                                             freq >= 100]
         json.dump(common_absorption_emission_pairs, json_file, indent=4)
@@ -98,7 +99,7 @@ def process_download_human_data(processed_data):
     image_file_name = 'absorption_max-emission_max distribution.png'
     image_path = os.path.join(intermediate_data_folder, image_file_name)
     plt.savefig(image_path, dpi=300, bbox_inches='tight')
-    print(f"{image_file_name} is saved at {image_path}")
+    print(f"saved image to {image_path}")
 
     concatenated_df = pd.concat(download_human_data_dfs + [chemfluo_data_df])
     concatenated_df.dropna(subset=['smiles', 'absorption_max', 'emission_max'], inplace=True)
@@ -116,7 +117,6 @@ def group_by_smiles(df):
     def custom_agg(x):
         return 1 if len(set([_ for _ in x if 3 <= _ <= 6])) >= 3 else 0
 
-    # grouped_df = df.groupby('smiles')['new_category'].max().reset_index()
     grouped_df = df.groupby('smiles').agg({'new_category': 'max',
                                            'absorption_max_category': custom_agg,
                                            'emission_max_category': custom_agg

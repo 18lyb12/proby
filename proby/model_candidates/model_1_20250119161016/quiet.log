@@ -1,0 +1,9 @@
+Fold 0
+Warning: Repeated SMILES found in data, pickle file of split indices cannot distinguish entries and will not be generated.
+Model 0 best validation auc = 0.553030 on epoch 0
+Model 0 test auc = 0.674740
+Ensemble test auc = 0.674740
+1-fold cross validation
+	Seed 42 ==> test auc = 0.674740
+Overall test auc = 0.674740 +/- 0.000000
+Elapsed time = 0:00:11

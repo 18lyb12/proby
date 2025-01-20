@@ -61,10 +61,10 @@ def split_data(df):
         test_df[f"Scaled {target_column}"] = test_df[target_column].apply(
             lambda x: (x - mean) / std_dev if pd.notna(x) and x != '' else x)
 
-    with open(os.path.join(common_data_folder, "scale_parameters_temp.json"), 'w') as json_file:
+    with open(os.path.join(common_data_folder, "scale_parameters.json"), 'w') as json_file:
         json.dump(scale_parameters, json_file, indent=4)
 
-    with open(os.path.join(common_data_folder, "common_solvents_temp.json"), 'w') as json_file:
+    with open(os.path.join(common_data_folder, "common_solvents.json"), 'w') as json_file:
         common_solvents = [solvent for solvent, freq in Counter(df["Solvent"]).most_common() if freq >= 100]
         json.dump(common_solvents, json_file, indent=4)
 
