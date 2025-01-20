@@ -1,0 +1,20 @@
+Smiles,Solvent,Scaled Absorption max (nm),Scaled Emission max (nm),Scaled Lifetime (ns),Scaled Quantum yield,Scaled log(e/mol-1 dm3 cm-1),Scaled abs FWHM (cm-1),Scaled emi FWHM (cm-1),Scaled abs FWHM (nm),Scaled emi FWHM (nm)
+COc1ccc2c3c(cccc13)C(=O)c1ccccc1-2,CCOCC,414.0786749,498.0079681,0.9,0.05,,,,,
+COc1ccc2c3cccc4c(OC)ccc(c5cccc1c52)c43,ClC(Cl)Cl,459.0,467.9787336,3.89,0.82,4.29666519,,,45.4,
+c1ccc(-c2nc(-c3ccccc3)nc(-c3ccc(-c4ccc(N5c6ccccc6[Si](c6ccccc6)(c6ccccc6)c6ccccc65)cc4)cc3)n2)cc1,ClC(Cl)Cl,,492.5925926,,,,,,,82.6
+CN(C)c1ccc(/C=C/c2ccccn2)cc1,CCO,357.0,476.0,,0.032,,,,,
+CN(C)c1ccc(/C=C/c2ccccn2)cc1,CC#N,355.0,473.0,0.202,0.048,,,,84.0,72.8
+CCn1nc(-c2ccc(F)cc2)c2ccc3[o+]c(-c4ccc(F)cc4)c4ccc1c2c34.[O-][Cl+3]([O-])([O-])[O-],CC(C)=O,485.0,525.0,,0.53,4.64246452,,,,
+Oc1ccc2ccccc2c1/C=N/CC/N=C/c1c(O)ccc2ccccc12,CC#N,408.0,466.0,,0.12,3.946452265,,,,
+COc1ccc(-n2c(-c3ccc(-c4cncc5ccccc45)cc3)nc(-c3ccccc3)c2-c2ccccc2)cc1,C1CCOC1,328.0,432.0,,,4.45484486,,,,
+CNc1cccc2c1-c1ccccc1C2=O,C1CCCCC1,449.0,536.0,8.8,0.094,3.322219295,,,,
+CCN(CC)c1ccc(/N=N/c2nc3ccc([N+](=O)[O-])cc3s2)cc1,ClCCl,549.0,603.0,8.14,,4.350248018,,,,75.0
+CCCCN1C(=O)c2cccc3cccc(c23)C1=O,CC#N,341.0,,,,,,,45.7,
+COc1cc(N(c2ccc(C=C(C#N)C#N)c(OC)c2)c2ccc(C=C(C#N)C#N)c(OC)c2)ccc1C=C(C#N)C#N,CN(C)C=O,454.0,575.0,0.06,0.026,4.681241237,,,93.0,111.1
+COc1ccc(-c2nc3c(c4c2-c2ccccc2CC4)-c2ccccc2CC3)cc1,CCOC(C)=O,310.0,425.0,,0.362,,,,,
+CC1(C)c2ccccc2N(c2ccc3c(c2)C(=O)c2ccc(N4c5ccccc5C(C)(C)c5ccccc54)cc2C3=O)c2ccccc21,Cc1ccccc1,527.0,662.0,,,3.333875078,,,112.9,
+CCCC(=O)c1c2c(c(C(=O)CCC)c3c1OC(CC(=O)OC)(C(=O)O)O3)OCO2,ClCCl,423.0,530.0,22.5,,,,,,
+CCCCC(CC)Cn1c2cc(C#N)ccc2c2cc(-c3ccc(N(c4ccccc4)c4ccccc4)cc3)c(C#N)cc21,Cc1ccccc1,,474.0,,,,,,,62.0
+NS(=O)(=O)c1ccc(N2N=C(c3ccc(O)cc3)CC2c2ccc(F)cc2)cc1,CS(C)=O,363.0,424.0,2.451,0.93,5.559906625,,,58.2,65.5
+CN(C)c1ccc(C2=Nc3scc(-c4ccc(C#N)cc4)[n+]3[B-](F)(F)O2)cc1,CN(C)c1ccc(C2=Nc3scc(-c4ccc(C#N)cc4)[n+]3[B-](F)(F)O2)cc1,,514.0,,,,,,,
+CCCCCCCCCCCCC(CCCCCCCCCC)Cn1c2cc(/C=C/C=C(C#N)C#N)c3cccc4c5cccc6c(/C=C/C=C(C#N)C#N)cc1c(c65)c2c34,Cc1ccccc1,597.0,668.0,,0.073,4.612783857,,,114.2,52.8
