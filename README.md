@@ -77,11 +77,15 @@ We built a simple app. There will be 3 pages:
     - Step 1: Run Model 1.5 to get prediction data.
     - Step 2: Select the SMILES whose scores are above the threshold.
     - Step 3: Run Model 2 to get prediction data.
+  
+  Note that you need to refresh the page to see the generated prediction data.
+
     
 - Page 2: Identify Substructures
 
   We leverage `chemprop`'s interpret method to predict the substructure.
   
+
 - Page 3: Display SMILES
   
   Display multiple SMILES.
