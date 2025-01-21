@@ -85,4 +85,8 @@ We built a simple app. There will be 3 pages:
 - Page 3: Display SMILES
   
   Display multiple SMILES.
-  
+
+### Run the code
+- Make sure you are under folder `proby`.
+- Run the command `python app.py`.
+- Open your browser and go to http://127.0.0.1:5000/ to see the app.
