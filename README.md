@@ -63,7 +63,7 @@ We run the evaluation on the test data generated in Data Preprocessing step.
 - Run the command `python -m proby.evaluation.model_15` to evaluate Model 1.5. The predication data will be stored in `data/processed_data`, the metrics will be printed out, the ROC curve and PR curve will be stored in `data/intermediate`.
 - Run the command `python -m proby.evaluation.model_2` to evaluate Model 2. The predication data will be stored in `data/processed_data`, the metrics will be printed out, the parity plot will be stored in `data/intermediate`.
 
-## Local Deploy
+## Local Application
 We built a simple app. There will be 3 pages:
 - Page 1: Predict Smiles from Files
   
