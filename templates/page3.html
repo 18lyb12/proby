@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page 3: Display Smiles</title>
+    <title>Page 3: Display SMILES</title>
 </head>
 <body>
-<h1>Page 3: Display Smiles</h1>
+<h1>Page 3: Display SMILES</h1>
 <form method="POST">
-    <label for="text_input">Enter One or More Smiles (format: smiles1,smiles2):</label>
+    <label for="text_input">Enter One or More SMILES (format: SMILES1,SMILES2):</label>
     <input type="text" name="text_input" placeholder="CCO,CC(O)=O">
     <button type="submit">Submit</button>
 </form>
 {% if message %}
 <h2>{{ message }}</h2>
 {% if image_url %}
-<img src="{{ image_url }}" alt="Smiles Plot">
+<img src="{{ image_url }}" alt="SMILES Plot">
 {% endif %}
 <br>
 {% endif %}

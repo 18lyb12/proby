@@ -8,7 +8,7 @@
 <body>
 <h1>Page 2: Identify Substructures</h1>
 <form method="POST">
-    <label for="text_input">Enter One Smiles:</label>
+    <label for="text_input">Enter One SMILES:</label>
     <input type="text" name="text_input" placeholder="C(=N/NC(NN)=S)\C1=CC=CC=C1">
     <br><br>
     <label for="new_input">Enter Additional Information:</label>
@@ -18,7 +18,7 @@
 {% if message %}
 <h2>{{ message }}</h2>
 {% if image_url %}
-<img src="{{ image_url }}" alt="Smiles Plot">
+<img src="{{ image_url }}" alt="SMILES Plot">
 {% endif %}
 <br>
 {% endif %}
