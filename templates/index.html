@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proby Homepage</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            text-align: left; /* Align text to the left */
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-top: 20px;
+        }
+
+        .link-container {
+            display: flex;
+            flex-direction: column; /* Stack links vertically */
+            align-items: flex-start; /* Align links to the left */
+            gap: 10px; /* Space between links */
+            margin-top: 20px;
+            padding-left: 20px; /* Space for the dots */
+        }
+
+        .link-container a {
+            color: #007bff;
+            font-size: 1.5em;
+            text-decoration: none;
+            position: relative; /* Needed for the pseudo-element positioning */
+        }
+
+        .link-container a::before {
+            content: '•'; /* The dot character */
+            position: absolute;
+            left: -20px; /* Position the dot outside the link */
+            top: 50%; /* Vertically center the dot */
+            transform: translateY(-50%); /* Adjust vertical centering */
+            color: #007bff; /* Match the link color */
+        }
+
+        .link-container a:hover {
+            text-decoration: underline;
+        }
+
+        img {
+            position: absolute; /* Position the image relative to the body */
+            bottom: 50px; /* Distance from the bottom */
+            right: 50px; /* Distance from the right */
+            max-width: 50px; /* Set a maximum width for the image */
+            height: auto; /* Maintain the aspect ratio */
+            opacity: 0.8; /* Slight transparency for a subtle effect */
+        }
+    </style>
+</head>
+<body>
+<h1>Proby Homepage</h1>
+<div class="link-container">
+    <a href="{{ url_for('page1') }}">Page 1: Predict SMILES from Files</a>
+    <a href="{{ url_for('page2') }}">Page 2: Identify Substructures</a>
+    <a href="{{ url_for('page3') }}">Page 3: Display SMILES</a>
+</div>
+
+<!-- Image below the links -->
+<a href="https://18lyb12.github.io/18lyb12.github.io-bzhu_academicpages/" target="_blank">
+    <img src="static/images/proby_logo.png" alt="Background Image">
+</a>
+
+</body>
+</html>

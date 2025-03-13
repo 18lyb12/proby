@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page 1: Predict SMILES from Files</title>
+    <style>
+        #log-box {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            overflow-y: scroll;
+            background-color: #f9f9f9;
+            font-family: 'DejaVu Sans Mono', 'Courier New', monospace;
+            margin-top: 20px;
+            box-sizing: border-box; /* Include padding in height calculation */
+            white-space: pre-wrap; /* Preserve spaces and allow text wrapping */
+        }
+
+
+    </style>
+</head>
+<body>
+<h1>Page 1: Predict SMILES from Files</h1>
+<form method="POST" enctype="multipart/form-data">
+    <label for="method">Choose a method:</label><br>
+    <input type="radio" id="method1" name="method" value="method1">
+    <label for="method1">Method 1</label><br>
+    <input type="radio" id="method2" name="method" value="method2">
+    <label for="method2">Method 2</label><br><br>
+    <label for="files">Upload multiple files:</label>
+    <input type="file" name="files[]" multiple><br><br>
+    <button type="submit">Upload and Process</button>
+</form>
+<div id="log-box"></div>
+<div id="output">
+    <h2>Download Processed Files</h2>
+    <ul>
+        {% for filename in output_files %}
+        <li><a href="{{ url_for('download_file', filename=filename) }}">{{ filename }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+<a href="{{ url_for('back_to_home') }}">Back to Homepage</a>
+
+<script>
+    let isUserScrolling = false;
+
+    // Detect if the user is scrolling manually
+    document.getElementById('log-box').addEventListener('scroll', function() {
+        const logBox = document.getElementById('log-box');
+        const scrollPosition = logBox.scrollTop + logBox.clientHeight;
+        const isAtBottom = scrollPosition >= logBox.scrollHeight - 1; // Small offset to avoid floating point precision issues
+
+        isUserScrolling = !isAtBottom; // If the user scrolls away from the bottom, set this to true
+    });
+
+    function fetchLog() {
+        fetch('/get_log')
+            .then(response => response.json())
+            .then(data => {
+                const logBox = document.getElementById('log-box');
+                logBox.innerHTML = data.join('<br>');
+
+                // Only auto-scroll if the user isn't scrolling manually
+                if (!isUserScrolling) {
+                    logBox.scrollTop = logBox.scrollHeight; // Scroll to the bottom of the log
+                }
+            });
+    }
+
+    setInterval(fetchLog, 1000);  // Update log every second
+
+</script>
+</body>
+</html>
