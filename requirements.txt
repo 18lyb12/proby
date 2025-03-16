@@ -1,0 +1,6 @@
+flask==3.0.2
+rdkit==2023.09.5
+chemprop==1.6.1
+pandas==2.1.3
+pathlib
+datetime
