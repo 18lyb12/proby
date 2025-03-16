@@ -7,20 +7,21 @@ import threading
 import time
 from pathlib import Path
 
-from proby.util import PredictionWithProgress, get_smiles, load_data, shared_logger
+from proby.app.util import get_smiles, load_data, shared_logger, PredictionWithProgress
 
 # Get the absolute path of the directory containing the current file
 current_file_path = Path(__file__).resolve()
 root_folder_path = current_file_path.parent
 
 # model
-model_15_dir = os.path.join(root_folder_path, 'models/model_1.5')
-model_2_dir = os.path.join(root_folder_path, 'models/model_2')
+model_1_dir = os.path.join(root_folder_path, '../models/model_1')
+model_2_dir = os.path.join(root_folder_path, '../models/model_2')
 
 # common
-common_data_folder = os.path.join(root_folder_path, "data/common")
+common_data_folder = os.path.join(root_folder_path, "../data/common")
 
-## model 1.5
+## model 1
+common_absorption_emission_pairs_path = os.path.join(common_data_folder, 'common_absorption_emission_pairs.json')
 reported_smiles_signal_path = os.path.join(common_data_folder, 'reported_smiles_signal.csv')
 
 ## model 2
@@ -29,13 +30,15 @@ scale_parameters_path = os.path.join(common_data_folder, 'scale_parameters.json'
 reported_active_smiles_properties_path = os.path.join(common_data_folder, 'reported_active_smiles_properties.csv')
 
 # intermediate
-intermediate_data_folder = os.path.join(root_folder_path, "data/prediction_data/intermediate")
+intermediate_data_folder = os.path.join(root_folder_path, "../data/prediction_data/intermediate")
 os.makedirs(intermediate_data_folder, exist_ok=True)
 
-## model 1.5
-model_15_data_path = os.path.join(intermediate_data_folder, 'model_1.5_data.csv')
+## model 1
+model_1_data_path = os.path.join(intermediate_data_folder, 'model_1_data.csv')
+model_1_features_path = os.path.join(intermediate_data_folder, 'model_1_features.csv')
 
-model_15_single_data_path = os.path.join(intermediate_data_folder, "model_1.5_single_data.csv")
+model_1_single_data_path = os.path.join(intermediate_data_folder, "model_1_single_data.csv")
+model_1_single_features_path = os.path.join(intermediate_data_folder, "model_1_single_features.csv")
 
 ## model 2
 model_2_data_path = os.path.join(intermediate_data_folder, 'model_2_data.csv')
@@ -45,13 +48,12 @@ model_2_single_data_path = os.path.join(intermediate_data_folder, "model_2_singl
 model_2_scaled_single_preds = os.path.join(intermediate_data_folder, 'model_2_scaled_single_preds.csv')
 
 # output
-output_data_folder = os.path.join(root_folder_path, "data/prediction_data/method2_output")
+output_data_folder = os.path.join(root_folder_path, "../data/prediction_data/method1_output")
 os.makedirs(output_data_folder, exist_ok=True)
 
-## model 1.5
-model_15_preds_path = os.path.join(output_data_folder, 'model_1.5_preds.csv')
-model_15_single_preds_path = os.path.join(output_data_folder, 'model_1.5_single_preds.csv')
-model_15_single_interpret_path = os.path.join(output_data_folder, 'model_1.5_single_interpret.csv')
+## model 1
+model_1_preds_path = os.path.join(output_data_folder, 'model_1_preds.csv')
+model_1_single_preds_path = os.path.join(output_data_folder, 'model_1_single_preds.csv')
 
 ## model 2
 model_2_preds_path = os.path.join(output_data_folder, 'model_2_preds.csv')
@@ -67,55 +69,65 @@ os.makedirs(report_folder, exist_ok=True)
 report_path = os.path.join(report_folder, "report.csv")
 
 
-def model_15(metadata):
-    shared_logger.log("model 1.5 session starts")
+def model_1(metadata):
+    shared_logger.log("model 1 session starts")
     ### create smiles
     shared_logger.log("creating smiles")
     smiles_list = metadata["smiles_list"]
     smiles_df = pd.DataFrame({"smiles": smiles_list})
 
-    model_15_data = smiles_df
-    model_15_data.to_csv(model_15_data_path, index=False, encoding='utf-8-sig')
+    ### load common_absorption_emission_pairs
+    shared_logger.log("loading common_absorption_emission_pairs")
+    with open(common_absorption_emission_pairs_path, 'r') as file:
+        common_absorption_emission_pairs = json.load(file)
+    absorption_emission_df = pd.DataFrame(common_absorption_emission_pairs, columns=["absorption_max", "emission_max"])
 
-    ## predict model 1.5
+    ### crose join
+    smiles_df['key'] = 1
+    absorption_emission_df['key'] = 1
+    model_1_data = pd.merge(smiles_df, absorption_emission_df, on='key', how='outer').drop('key', axis=1)
+    model_1_data.to_csv(model_1_data_path, index=False, encoding='utf-8-sig')
+    model_1_data[["absorption_max", "emission_max"]].to_csv(model_1_features_path, index=False, encoding='utf-8-sig')
+
+    ## predict model 1
     prediction_with_progress = PredictionWithProgress()
-    wait_thread = threading.Thread(target=prediction_with_progress.print_wait_message, args=("predicting model 1.5",))
+    wait_thread = threading.Thread(target=prediction_with_progress.print_wait_message, args=("predicting model 1",))
     wait_thread.start()
-    model_15_preds_df = predict_model_15(test_path=model_15_data_path,
-                                         preds_path=model_15_preds_path)
+    model_1_preds_df = predict_model_1(test_path=model_1_data_path,
+                                       features_path=model_1_features_path,
+                                       preds_path=model_1_preds_path)
     prediction_with_progress.stop_flag.set()
     wait_thread.join()
-    metadata["model_15_preds_df"] = model_15_preds_df
+    metadata["model_1_preds_df"] = model_1_preds_df
 
-    df = model_15_preds_df[model_15_preds_df['new_category'] != "Invalid SMILES"]
+    df = model_1_preds_df[model_1_preds_df['new_category'] != "Invalid SMILES"]
     df['new_category'] = df['new_category'].astype(float)
+
+    grouped_df = df.groupby('smiles')['new_category'].max().reset_index()
 
     ### load reported smiles signal
     shared_logger.log("loading reported smiles signal")
     reported_smiles_signal_df = pd.read_csv(reported_smiles_signal_path)
     metadata["reported_smiles_signal_df"] = reported_smiles_signal_df
+    grouped_df = pd.merge(grouped_df, reported_smiles_signal_df, on='smiles', how='left')
 
-    df = pd.merge(df, reported_smiles_signal_df, on='smiles', how='left')
-
-    ## pred 1.5 smiles
-    # DIY
+    # pred 1 smiles
     threshold = 0.95
     shared_logger.log(f"using threshold {threshold} to select smiles")
     metadata["threshold"] = threshold
-    df['new_category'] = df['new_category'].astype(float)
-    df['true_category'] = df['true_category'].astype(float)
-    df["high_pred_score"] = df['new_category'].apply(lambda x: 1 if x >= threshold else 0)
-    # preds_15 = df[(df['high_pred_score'] == 1) | (df['true_category'] == 1)]
-    preds_15 = df[((df['true_category'].isna()) & (df['high_pred_score'] == 1)) | (df['true_category'] == 1)]
-    preds_15.head(5)
+    grouped_df['new_category'] = grouped_df['new_category'].astype(float)
+    grouped_df['true_category'] = grouped_df['true_category'].astype(float)
+    grouped_df["high_pred_score"] = grouped_df['new_category'].apply(lambda x: 1 if x >= threshold else 0)
+    preds_1 = grouped_df[((grouped_df['true_category'].isna()) & (grouped_df['high_pred_score'] == 1)) | (
+            grouped_df['true_category'] == 1)]
 
     ## selected_smiles
-    selected_smiles = preds_15["smiles"].to_list()
+    selected_smiles = preds_1["smiles"].to_list()
     shared_logger.log(
         f"{len(selected_smiles)} selected smiles in total, including {', '.join(selected_smiles[:5])}, etc.")
     metadata["selected_smiles"] = selected_smiles
 
-    shared_logger.log("model 1.5 session ends")
+    shared_logger.log("model 1 session ends")
 
 
 def model_2(metadata):
@@ -159,18 +171,35 @@ def model_2(metadata):
 
 
 def generate_comprehensive_prediction(metadata):
-    shared_logger.log("generating comprehensive prediction")
     # Generate Comprehensive Prediction
-    model_15_preds_df = metadata["model_15_preds_df"]
+    shared_logger.log("generating comprehensive prediction")
+    model_1_preds_df = metadata["model_1_preds_df"]
+    model_1_preds_df.loc[model_1_preds_df['new_category'] == 'Invalid SMILES', 'new_category'] = -1
+    model_1_preds_df['new_category'] = model_1_preds_df['new_category'].astype(float)
+
+    grouped_model_1_preds_df = model_1_preds_df.loc[model_1_preds_df.groupby('smiles')['new_category'].idxmax()]
     threshold = metadata["threshold"]
-    model_15_preds_df["high_pred_score"] = model_15_preds_df['new_category'].apply(
-        lambda x: 1 if (x != "Invalid SMILES" and float(x) >= threshold) else 0)
-    model_15_preds_df.rename(columns={"new_category": "activity_score"}, inplace=True)
+    grouped_model_1_preds_df["high_pred_score"] = grouped_model_1_preds_df['new_category'].apply(
+        lambda x: 1 if x >= threshold else 0)
+
+    def write_model_pred(row):
+        if row['new_category'] == -1:
+            activity_score = "Invalid SMILES"
+            model_1_comments = "Invalid SMILES"
+        else:
+            activity_score = row['new_category']
+            model_1_comments = f"absorption_max {row['absorption_max']}, emission_max {row['emission_max']}"
+        return pd.Series([activity_score, model_1_comments])
+
+    grouped_model_1_preds_df[['activity_score', 'model_1_comments']] = grouped_model_1_preds_df.apply(write_model_pred,
+                                                                                                      axis=1)
+    grouped_model_1_preds_df.drop(columns=['absorption_max', 'emission_max', 'new_category'], inplace=True)
 
     reported_smiles_signal_df = metadata["reported_smiles_signal_df"]
-    model_15_preds_report_df = pd.merge(model_15_preds_df, reported_smiles_signal_df, on='smiles', how='left')
-    model_15_preds_report_df['true_category'] = model_15_preds_report_df['true_category'].fillna("NA")
-    model_15_preds_report_df.rename(columns={"smiles": "smiles_"}, inplace=True)
+    grouped_model_1_preds_report_df = pd.merge(grouped_model_1_preds_df, reported_smiles_signal_df, on='smiles',
+                                               how='left')
+    grouped_model_1_preds_report_df['true_category'] = grouped_model_1_preds_report_df['true_category'].fillna("NA")
+    grouped_model_1_preds_report_df.rename(columns={"smiles": "smiles_"}, inplace=True)
 
     input_data_folder = metadata["input_data_folder"]
     model_2_preds_df = metadata["model_2_preds_df"]
@@ -192,11 +221,10 @@ def generate_comprehensive_prediction(metadata):
             with pd.ExcelWriter(output_full_path) as writer:
                 for i, solvent in enumerate(common_solvents):
                     shared_logger.log(f"\tgenerating sheet {solvent} ...")
+                    merged_preds_report_1 = pd.merge(df, grouped_model_1_preds_report_df, left_on=column_name,
+                                                     right_on='smiles_', how='left')
 
-                    merged_preds_report_15 = pd.merge(df, model_15_preds_report_df, left_on=column_name,
-                                                      right_on='smiles_', how='left')
-
-                    merged_preds_2 = pd.merge(merged_preds_report_15,
+                    merged_preds_2 = pd.merge(merged_preds_report_1,
                                               model_2_preds_df[model_2_preds_df['Solvent'] == solvent],
                                               left_on='smiles_', right_on='Smiles', how='left')
                     merged_preds_2["Solvent"] = solvent
@@ -208,43 +236,43 @@ def generate_comprehensive_prediction(metadata):
 
                     sheet_name = f"{solvent} ({i + 1})"
                     comprehensive_preds.to_excel(writer, sheet_name=sheet_name, index=False)
-            shutil.copy(output_full_path, os.path.join(app_output_data_folder, f"[method 2] processed {file_name}"))
+            shutil.copy(output_full_path, os.path.join(app_output_data_folder, f"[method 1] processed {file_name}"))
 
 
 def generate_report(metadata):
     shared_logger.log("generating report")
     all_input_smiles = set()
-    all_model_15_reported_smiles = set()
-    all_model_15_reported_positive_smiles = set()
-    all_model_15_reported_negative_smiles = set()
-    all_model_15_not_reported_smiles = set()
-    all_model_15_not_reported_positive_smiles = set()
-    all_model_15_not_reported_negative_smiles = set()
+    all_model_1_reported_smiles = set()
+    all_model_1_reported_positive_smiles = set()
+    all_model_1_reported_negative_smiles = set()
+    all_model_1_not_reported_smiles = set()
+    all_model_1_not_reported_positive_smiles = set()
+    all_model_1_not_reported_negative_smiles = set()
     all_model_2_candidates_pairs = set()
     all_model_2_property_reported_pairs = set()
     all_model_2_property_not_reported_pairs = set()
     report = {"file_name": [],
               "input_smiles": [],
-              "model_1.5_reported_smiles": [],
-              "model_1.5_reported_positive_smiles": [],
-              "model_1.5_reported_negative_smiles": [],
-              "model_1.5_not_reported_smiles": [],
-              "model_1.5_not_reported_positive_smiles": [],
-              "model_1.5_not_reported_negative_smiles": [],
+              "model_1_reported_smiles": [],
+              "model_1_reported_positive_smiles": [],
+              "model_1_reported_negative_smiles": [],
+              "model_1_not_reported_smiles": [],
+              "model_1_not_reported_positive_smiles": [],
+              "model_1_not_reported_negative_smiles": [],
               "model_2_candidates_pairs": [],
               "model_2_property_reported_pairs": [],
               "model_2_property_not_reported_pairs": [],
               }
     for file_name in os.listdir(comprehensive_folder):
-        shared_logger.log(f"{file_name}")
+        shared_logger.log(f"processing {file_name}")
 
         total_input_smiles = set()
-        total_model_15_reported_smiles = set()
-        total_model_15_reported_positive_smiles = set()
-        total_model_15_reported_negative_smiles = set()
-        total_model_15_not_reported_smiles = set()
-        total_model_15_not_reported_positive_smiles = set()
-        total_model_15_not_reported_negative_smiles = set()
+        total_model_1_reported_smiles = set()
+        total_model_1_reported_positive_smiles = set()
+        total_model_1_reported_negative_smiles = set()
+        total_model_1_not_reported_smiles = set()
+        total_model_1_not_reported_positive_smiles = set()
+        total_model_1_not_reported_negative_smiles = set()
         total_model_2_candidates_pairs = set()
         total_model_2_property_reported_pairs = set()
         total_model_2_property_not_reported_pairs = set()
@@ -261,23 +289,23 @@ def generate_report(metadata):
                 column_name = [column for column in df.columns if column.lower() == "smiles"][0]
                 input_smiles = get_smiles(df, column_name)
 
-                model_15_reported_df = df[~df["true_category"].isna()]
-                model_15_reported_positive_df = model_15_reported_df[model_15_reported_df["true_category"] == 1]
-                model_15_reported_negative_df = model_15_reported_df[model_15_reported_df["true_category"] == 0]
+                model_1_reported_df = df[~df["true_category"].isna()]
+                model_1_reported_positive_df = model_1_reported_df[model_1_reported_df["true_category"] == 1]
+                model_1_reported_negative_df = model_1_reported_df[model_1_reported_df["true_category"] == 0]
 
-                model_15_reported_smiles = get_smiles(model_15_reported_df, column_name)
-                model_15_reported_positive_smiles = get_smiles(model_15_reported_positive_df, column_name)
-                model_15_reported_negative_smiles = get_smiles(model_15_reported_negative_df, column_name)
+                model_1_reported_smiles = get_smiles(model_1_reported_df, column_name)
+                model_1_reported_positive_smiles = get_smiles(model_1_reported_positive_df, column_name)
+                model_1_reported_negative_smiles = get_smiles(model_1_reported_negative_df, column_name)
 
-                model_15_not_reported_df = df[df["true_category"].isna()]
-                model_15_not_reported_positive_df = model_15_not_reported_df[
-                    model_15_not_reported_df["high_pred_score"] == 1]
-                model_15_not_reported_negative_df = model_15_not_reported_df[
-                    model_15_not_reported_df["high_pred_score"] == 0]
+                model_1_not_reported_df = df[df["true_category"].isna()]
+                model_1_not_reported_positive_df = model_1_not_reported_df[
+                    model_1_not_reported_df["high_pred_score"] == 1]
+                model_1_not_reported_negative_df = model_1_not_reported_df[
+                    model_1_not_reported_df["high_pred_score"] == 0]
 
-                model_15_not_reported_smiles = get_smiles(model_15_not_reported_df, column_name)
-                model_15_not_reported_positive_smiles = get_smiles(model_15_not_reported_positive_df, column_name)
-                model_15_not_reported_negative_smiles = get_smiles(model_15_not_reported_negative_df, column_name)
+                model_1_not_reported_smiles = get_smiles(model_1_not_reported_df, column_name)
+                model_1_not_reported_positive_smiles = get_smiles(model_1_not_reported_positive_df, column_name)
+                model_1_not_reported_negative_smiles = get_smiles(model_1_not_reported_negative_df, column_name)
 
                 model_2_candidates_df = df[
                     (df["true_category"] == 1) | ((df["true_category"].isna()) & (df["high_pred_score"] == 1))]
@@ -294,41 +322,41 @@ def generate_report(metadata):
 
                 shared_logger.log(f"\t there are {len(input_smiles)} smiles in input data.")
 
-                shared_logger.log(f"\t\t {len(model_15_reported_smiles)} are reported. "
-                                  f"{len(model_15_reported_positive_smiles)} positive, "
-                                  f"{len(model_15_reported_negative_smiles)} negative")
+                shared_logger.log(f"\t\t {len(model_1_reported_smiles)} are reported. "
+                                  f"{len(model_1_reported_positive_smiles)} positive, "
+                                  f"{len(model_1_reported_negative_smiles)} negative")
 
-                shared_logger.log(f"\t\t {len(model_15_not_reported_smiles)} are not reported. "
-                                  f"{len(model_15_not_reported_positive_smiles)} positive, "
-                                  f"{len(model_15_not_reported_negative_smiles)} negative")
+                shared_logger.log(f"\t\t {len(model_1_not_reported_smiles)} are not reported. "
+                                  f"{len(model_1_not_reported_positive_smiles)} positive, "
+                                  f"{len(model_1_not_reported_negative_smiles)} negative")
 
                 shared_logger.log(
                     f"\t there are {len(model_2_candidates_pairs)} (smiles, solvent) pairs are predicted by model 2.")
                 shared_logger.log(f"\t\t {len(model_2_property_reported_pairs)} are reported,")
                 shared_logger.log(f"\t\t {len(model_2_property_not_reported_pairs)} are not reported.")
 
-                assert len(model_2_candidates_pairs) == len(model_15_reported_positive_smiles) + len(
-                    model_15_not_reported_positive_smiles)
+                assert len(model_2_candidates_pairs) == len(model_1_reported_positive_smiles) + len(
+                    model_1_not_reported_positive_smiles)
                 total_input_smiles |= input_smiles
-                total_model_15_reported_smiles |= model_15_reported_smiles
-                total_model_15_reported_positive_smiles |= model_15_reported_positive_smiles
-                total_model_15_reported_negative_smiles |= model_15_reported_negative_smiles
-                total_model_15_not_reported_smiles |= model_15_not_reported_smiles
-                total_model_15_not_reported_positive_smiles |= model_15_not_reported_positive_smiles
-                total_model_15_not_reported_negative_smiles |= model_15_not_reported_negative_smiles
+                total_model_1_reported_smiles |= model_1_reported_smiles
+                total_model_1_reported_positive_smiles |= model_1_reported_positive_smiles
+                total_model_1_reported_negative_smiles |= model_1_reported_negative_smiles
+                total_model_1_not_reported_smiles |= model_1_not_reported_smiles
+                total_model_1_not_reported_positive_smiles |= model_1_not_reported_positive_smiles
+                total_model_1_not_reported_negative_smiles |= model_1_not_reported_negative_smiles
                 total_model_2_candidates_pairs |= model_2_candidates_pairs
                 total_model_2_property_reported_pairs |= model_2_property_reported_pairs
                 total_model_2_property_not_reported_pairs |= model_2_property_not_reported_pairs
 
         shared_logger.log(f" there are {len(total_input_smiles)} smiles in input data.")
 
-        shared_logger.log(f"\t {len(total_model_15_reported_smiles)} are reported. "
-                          f"{len(total_model_15_reported_positive_smiles)} positive, "
-                          f"{len(total_model_15_reported_negative_smiles)} negative")
+        shared_logger.log(f"\t {len(total_model_1_reported_smiles)} are reported. "
+                          f"{len(total_model_1_reported_positive_smiles)} positive, "
+                          f"{len(total_model_1_reported_negative_smiles)} negative")
 
-        shared_logger.log(f"\t {len(total_model_15_not_reported_smiles)} are not reported. "
-                          f"{len(total_model_15_not_reported_positive_smiles)} positive, "
-                          f"{len(total_model_15_not_reported_negative_smiles)} negative")
+        shared_logger.log(f"\t {len(total_model_1_not_reported_smiles)} are not reported. "
+                          f"{len(total_model_1_not_reported_positive_smiles)} positive, "
+                          f"{len(total_model_1_not_reported_negative_smiles)} negative")
 
         shared_logger.log(
             f" there are {len(total_model_2_candidates_pairs)} (smiles, solvent) pairs are predicted by model 2.")
@@ -337,36 +365,36 @@ def generate_report(metadata):
 
         report["file_name"].append(file_name)
         report["input_smiles"].append(len(total_input_smiles))
-        report["model_1.5_reported_smiles"].append(len(total_model_15_reported_smiles))
-        report["model_1.5_reported_positive_smiles"].append(len(total_model_15_reported_positive_smiles))
-        report["model_1.5_reported_negative_smiles"].append(len(total_model_15_reported_negative_smiles))
-        report["model_1.5_not_reported_smiles"].append(len(total_model_15_not_reported_smiles))
-        report["model_1.5_not_reported_positive_smiles"].append(len(total_model_15_not_reported_positive_smiles))
-        report["model_1.5_not_reported_negative_smiles"].append(len(total_model_15_not_reported_negative_smiles))
+        report["model_1_reported_smiles"].append(len(total_model_1_reported_smiles))
+        report["model_1_reported_positive_smiles"].append(len(total_model_1_reported_positive_smiles))
+        report["model_1_reported_negative_smiles"].append(len(total_model_1_reported_negative_smiles))
+        report["model_1_not_reported_smiles"].append(len(total_model_1_not_reported_smiles))
+        report["model_1_not_reported_positive_smiles"].append(len(total_model_1_not_reported_positive_smiles))
+        report["model_1_not_reported_negative_smiles"].append(len(total_model_1_not_reported_negative_smiles))
         report["model_2_candidates_pairs"].append(len(total_model_2_candidates_pairs))
         report["model_2_property_reported_pairs"].append(len(total_model_2_property_reported_pairs))
         report["model_2_property_not_reported_pairs"].append(len(total_model_2_property_not_reported_pairs))
 
         all_input_smiles |= total_input_smiles
-        all_model_15_reported_smiles |= total_model_15_reported_smiles
-        all_model_15_reported_positive_smiles |= total_model_15_reported_positive_smiles
-        all_model_15_reported_negative_smiles |= total_model_15_reported_negative_smiles
-        all_model_15_not_reported_smiles |= total_model_15_not_reported_smiles
-        all_model_15_not_reported_positive_smiles |= total_model_15_not_reported_positive_smiles
-        all_model_15_not_reported_negative_smiles |= total_model_15_not_reported_negative_smiles
+        all_model_1_reported_smiles |= total_model_1_reported_smiles
+        all_model_1_reported_positive_smiles |= total_model_1_reported_positive_smiles
+        all_model_1_reported_negative_smiles |= total_model_1_reported_negative_smiles
+        all_model_1_not_reported_smiles |= total_model_1_not_reported_smiles
+        all_model_1_not_reported_positive_smiles |= total_model_1_not_reported_positive_smiles
+        all_model_1_not_reported_negative_smiles |= total_model_1_not_reported_negative_smiles
         all_model_2_candidates_pairs |= total_model_2_candidates_pairs
         all_model_2_property_reported_pairs |= total_model_2_property_reported_pairs
         all_model_2_property_not_reported_pairs |= total_model_2_property_not_reported_pairs
 
     shared_logger.log(f"there are {len(all_input_smiles)} smiles in input data.")
 
-    shared_logger.log(f" {len(all_model_15_reported_smiles)} are reported. "
-                      f"{len(all_model_15_reported_positive_smiles)} positive, "
-                      f"{len(all_model_15_reported_negative_smiles)} negative")
+    shared_logger.log(f" {len(all_model_1_reported_smiles)} are reported. "
+                      f"{len(all_model_1_reported_positive_smiles)} positive, "
+                      f"{len(all_model_1_reported_negative_smiles)} negative")
 
-    shared_logger.log(f" {len(all_model_15_not_reported_smiles)} are not reported. "
-                      f"{len(all_model_15_not_reported_positive_smiles)} positive, "
-                      f"{len(all_model_15_not_reported_negative_smiles)} negative")
+    shared_logger.log(f" {len(all_model_1_not_reported_smiles)} are not reported. "
+                      f"{len(all_model_1_not_reported_positive_smiles)} positive, "
+                      f"{len(all_model_1_not_reported_negative_smiles)} negative")
 
     shared_logger.log(
         f"there are {len(all_model_2_candidates_pairs)} (smiles, solvent) pairs are predicted by model 2.")
@@ -375,12 +403,12 @@ def generate_report(metadata):
 
     report["file_name"].append("all")
     report["input_smiles"].append(len(all_input_smiles))
-    report["model_1.5_reported_smiles"].append(len(all_model_15_reported_smiles))
-    report["model_1.5_reported_positive_smiles"].append(len(all_model_15_reported_positive_smiles))
-    report["model_1.5_reported_negative_smiles"].append(len(all_model_15_reported_negative_smiles))
-    report["model_1.5_not_reported_smiles"].append(len(all_model_15_not_reported_smiles))
-    report["model_1.5_not_reported_positive_smiles"].append(len(all_model_15_not_reported_positive_smiles))
-    report["model_1.5_not_reported_negative_smiles"].append(len(all_model_15_not_reported_negative_smiles))
+    report["model_1_reported_smiles"].append(len(all_model_1_reported_smiles))
+    report["model_1_reported_positive_smiles"].append(len(all_model_1_reported_positive_smiles))
+    report["model_1_reported_negative_smiles"].append(len(all_model_1_reported_negative_smiles))
+    report["model_1_not_reported_smiles"].append(len(all_model_1_not_reported_smiles))
+    report["model_1_not_reported_positive_smiles"].append(len(all_model_1_not_reported_positive_smiles))
+    report["model_1_not_reported_negative_smiles"].append(len(all_model_1_not_reported_negative_smiles))
     report["model_2_candidates_pairs"].append(len(all_model_2_candidates_pairs))
     report["model_2_property_reported_pairs"].append(len(all_model_2_property_reported_pairs))
     report["model_2_property_not_reported_pairs"].append(len(all_model_2_property_not_reported_pairs))
@@ -390,29 +418,31 @@ def generate_report(metadata):
     report_df.to_csv(report_path, index=False)
 
     app_output_data_folder = metadata["app_output_data_folder"]
-    shutil.copy(report_path, os.path.join(app_output_data_folder, "[method 2] report.csv"))
+    shutil.copy(report_path, os.path.join(app_output_data_folder, "[method 1] report.csv"))
 
 
-def method2(metadata):
+def method1(metadata):
     load_data(metadata)
-    model_15(metadata)
+    model_1(metadata)
     model_2(metadata)
     generate_comprehensive_prediction(metadata)
     generate_report(metadata)
 
 
-def predict_model_15(test_path, preds_path):
+def predict_model_1(test_path, features_path, preds_path):
     arguments = [
         '--test_path', test_path,
+        '--features_path', features_path,
         '--preds_path', preds_path,
-        '--checkpoint_dir', model_15_dir,
+        '--checkpoint_dir', model_1_dir,
     ]
 
     args = chemprop.args.PredictArgs().parse_args(arguments)
+
     t0 = time.time()
     preds = chemprop.train.make_predictions(args=args)
     t1 = time.time()
-    shared_logger.log(f"model 1.5 prediction completed! total time: {t1 - t0} s")
+    shared_logger.log(f"model 1 prediction completed! total time: {t1 - t0} s")
     df = pd.read_csv(preds_path)
     return df
 
@@ -448,22 +478,3 @@ def predict_model_2(test_path, scaled_preds_path, preds_path):
         df = df.drop(f"Scaled {target_column}", axis=1)
     df.to_csv(preds_path, index=False, encoding='utf-8-sig')
     return df
-
-
-def interpret_model_15(smiles, prop_delta=0.99):
-    model_15_single_data = pd.DataFrame({"smiles": [smiles], "new_category": [1]})
-    model_15_single_data.to_csv(model_15_single_data_path, index=False, encoding='utf-8-sig')
-
-    arguments = [
-        '--data_path', model_15_single_data_path,
-        '--smiles_columns', 'smiles',
-        '--property_id', '1',
-        '--checkpoint_dir', model_15_dir,
-        '--interpret_output_path', model_15_single_interpret_path,
-        '--prop_delta', str(prop_delta)
-    ]
-
-    args = chemprop.args.InterpretArgs().parse_args(arguments)
-    preds = chemprop.interpret.interpret(args=args)
-
-    return preds[0]

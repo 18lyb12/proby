@@ -4,10 +4,10 @@ from flask import Flask, render_template, request, redirect, url_for, send_from_
 from rdkit import Chem
 from rdkit.Chem import Draw
 
-from proby.method1 import method1
-from proby.method2 import method2, interpret_model_15
-from proby.util import delete_files_in_folder, plot_proby_logo
-from proby.util import shared_logger
+from proby.app.method1 import method1
+from proby.app.method2 import method2, interpret_model_15
+from proby.app.util import delete_files_in_folder, plot_proby_logo
+from proby.app.util import shared_logger
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'input'
