@@ -66,7 +66,7 @@ There will be 3 pages:
 #### Page 1: Predict Smiles from Files
 
   You have option to select Method 1 or Method 2, and upload multiple ".xlsx" or ".csv" files with `SMILES` column (case-insensitive). Find the sample data in `proby/data/app_sample_data`. This process will end up generating the prediction data.
-  - Step 1: Generate Model 1 prediction data input. `SMILES` column is given from input data. We cross join the input data with N most common (absorption, emission) pairs which is derived by `chemfluo的数据集` and `下载数据+人工整理.xlsx`.
+  - Step 1: Generate Model 1 prediction data input. `SMILES` column is given from input data. We cross join the input data with N most common (absorption, emission) pairs which is derived by PubChem dataset, SCI dataset, and manually collected dataset.
   - Step 2. Run Model 1 to get prediction data.
   - Step 3: Group by SMILES. Each SMILES will have N predictions on different (absorption, emission) pairs, we pick the maximum prediction score as the prediction score for the certain SMILES. Select the SMILES whose scores are above the threshold (default = 0.95).
   - Step 4: Run Model 2 to get prediction data.
