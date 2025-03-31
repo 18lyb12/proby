@@ -67,11 +67,6 @@ def main():
                                       roc_fig_path=os.path.join(processed_data_folder, "model_1_ROC.png"),
                                       pr_fig_path=os.path.join(processed_data_folder, "model_1_PR.png"))
 
-    grouped_df = group_by_smiles(df)
-    classification_evaluation_summary(grouped_df['true_category'], grouped_df['pred_category'],
-                                      roc_fig_path=os.path.join(processed_data_folder, "model_1_grouped_ROC.png"),
-                                      pr_fig_path=os.path.join(processed_data_folder, "model_1_grouped_PR.png"))
-
     df_sorted = df.sort_values(by="pred_category", ascending=False)
     k = 1000
     top = df_sorted.head(k)
