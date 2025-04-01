@@ -21,7 +21,7 @@ pip install -r requirements.txt
 
 ## Model Download
 
-The proby models can be accessed from [weights](https://drive.google.com/drive/folders/1oEL6XBQZXhrMlU0YYn5407uNH8383KhW?usp=sharing). Put the downloaded model files into `proby/models/model_1`, `proby/models/model_1.5`, and `proby/models/model_2` respectively.
+The proby models can be accessed from [weights](https://drive.google.com/drive/folders/1oEL6XBQZXhrMlU0YYn5407uNH8383KhW?usp=sharing). Put the downloaded model files into `proby/models/model_1` and `proby/models/model_2` respectively.
 
 ### Dataset Download
 
