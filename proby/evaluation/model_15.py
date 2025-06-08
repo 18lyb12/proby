@@ -9,7 +9,7 @@ from proby.evaluation.util import classification_evaluation_summary
 current_file_path = Path(__file__).resolve()
 root_folder_path = current_file_path.parents[1]
 processed_data_folder = os.path.join(root_folder_path, 'data/processed_data')
-test_full_path = os.path.join(processed_data_folder, 'model_1.5_test_full.csv')
+test_full_path = os.path.join(processed_data_folder, 'model_1.5_test_full.csv')  # required input file
 test_smiles_path = os.path.join(processed_data_folder, 'model_1.5_smiles.csv')
 test_preds_path = os.path.join(processed_data_folder, 'model_1.5_test_preds.csv')
 test_preds_full_path = os.path.join(processed_data_folder, 'model_1.5_test_preds_full.csv')
