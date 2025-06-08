@@ -8,7 +8,7 @@ from proby.evaluation.util import classification_evaluation_summary
 current_file_path = Path(__file__).resolve()
 root_folder_path = current_file_path.parents[1]
 processed_data_folder = os.path.join(root_folder_path, 'data/processed_data')
-test_full_path = os.path.join(processed_data_folder, 'model_1_test_full.csv')
+test_full_path = os.path.join(processed_data_folder, 'model_1_test_full.csv')  # required input file
 test_smiles_path = os.path.join(processed_data_folder, 'model_1_test_smiles.csv')
 test_features_path = os.path.join(processed_data_folder, 'model_1_test_features.csv')
 test_preds_path = os.path.join(processed_data_folder, 'model_1_test_preds.csv')
@@ -21,7 +21,7 @@ def prediction():
 
     test_df = pd.read_csv(test_full_path)
     test_df[["smiles"]].to_csv(test_smiles_path, index=False, encoding='utf-8-sig')
-    test_features_df = test_df[["absorption_max", "emission_max"]]
+    test_features_df = test_df[["absorption", "emission"]]
     test_features_df.to_csv(test_features_path, index=False, encoding='utf-8-sig')
 
     arguments = [
@@ -40,24 +40,6 @@ def prediction():
     test_df['pred_category'] = test_df['pred_category'].astype(float)
     test_df.to_csv(test_preds_full_path, index=False)
     return test_df
-
-
-def group_by_smiles(df):
-    df["absorption_max_category"] = df["absorption_max"].apply(lambda x: int(float(x) / 100))
-    df["emission_max_category"] = df["emission_max"].apply(lambda x: int(float(x) / 100))
-
-    def custom_agg(x):
-        return 1 if len(set([_ for _ in x if 3 <= _ <= 6])) >= 3 else 0
-
-    grouped_df = df.groupby('smiles').agg({'pred_category': 'max',
-                                           'true_category': 'max',
-                                           'new_category': 'max',
-                                           'absorption_max_category': custom_agg,
-                                           'emission_max_category': custom_agg
-                                           }).reset_index()
-    grouped_df = grouped_df[(grouped_df['new_category'] == 1) | (grouped_df['absorption_max_category'] == 1) | (
-                grouped_df['emission_max_category'] == 1)].reset_index()
-    return grouped_df
 
 
 def main():
