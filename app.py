@@ -4,10 +4,8 @@ from flask import Flask, render_template, request, redirect, url_for, send_from_
 from rdkit import Chem
 from rdkit.Chem import Draw
 
-from proby.app.method1 import method1
-from proby.app.method2 import method2, interpret_model_15
-from proby.app.util import delete_files_in_folder, plot_proby_logo
-from proby.app.util import shared_logger
+from proby.app.pipeline import process_files
+from proby.app.util import delete_files_in_folder, shared_logger
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'input'
@@ -32,11 +30,6 @@ def home():
 @app.route('/page1', methods=['GET', 'POST'])
 def page1():
     if request.method == 'POST':
-        method = request.form.get('method')
-        if not method:
-            shared_logger.log("Error: No method selected.")
-            return redirect(url_for('page1'))
-
         if 'files[]' in request.files:
             # delete previously uploaded files in input folder
             delete_files_in_folder(app.config['UPLOAD_FOLDER'])
@@ -48,26 +41,15 @@ def page1():
                 shared_logger.log(f'Uploaded file: {filename}')
 
             # Start processing in a separate thread
-            threading.Thread(target=process_files, args=(method,)).start()
+            metadata = {
+                "input_data_folder": app.config['UPLOAD_FOLDER'],
+                "app_output_data_folder": app.config['OUTPUT_FOLDER']
+            }
+            threading.Thread(target=process_files, args=(metadata,)).start()
             return redirect(url_for('page1'))
 
     output_files = os.listdir(app.config['OUTPUT_FOLDER'])
     return render_template('page1.html', output_files=output_files)
-
-
-# Function to simulate file processing
-def process_files(method):
-    shared_logger.log(f"Starting file processing with {method}...")
-    metadata = {"input_data_folder": app.config['UPLOAD_FOLDER'],
-                "app_output_data_folder": app.config['OUTPUT_FOLDER']}
-    if method == "method1":
-        method1(metadata)
-    else:
-        method2(metadata)
-
-    shared_logger.log(f"File processing with {method} completed.")
-    shared_logger.log("*** Refresh the page to download the processed files ***")
-    plot_proby_logo()
 
 
 # Route to fetch the real-time log
@@ -83,34 +65,8 @@ def download_file(filename):
 
 
 # Route to handle Page 2
-@app.route('/page2', methods=['GET', 'POST'])
+@app.route('/page2')
 def page2():
-    if request.method == 'POST':
-        smiles = request.form['text_input']
-        prop_delta = request.form['new_input']
-        try:
-            if not prop_delta:
-                prop_delta = 0.95
-
-            if not Chem.MolFromSmiles(smiles):
-                raise ValueError("Invalid input")
-
-            original_smiles, prediction_score, sub_smiles, rationale_score = interpret_model_15(smiles, prop_delta)
-
-            img = Draw.MolsToGridImage([Chem.MolFromSmiles(original_smiles), Chem.MolFromSmiles(sub_smiles)],
-                                       molsPerRow=2, subImgSize=(500, 500), legends=[original_smiles, sub_smiles],
-                                       returnPNG=False)
-
-            # Save image to static folder
-            image_path = os.path.join('static', 'images', 'interpret.png')
-            img.save(image_path)
-
-            message = f"prediction score: {prediction_score}, rationale score: {rationale_score}"
-            return render_template('page2.html', message=message,
-                                   image_url=url_for('static', filename='images/interpret.png'))
-        except ValueError:
-            return render_template('page2.html', message="Invalid smiles. Please enter a valid smiles.")
-
     return render_template('page2.html')
 
 
@@ -132,12 +88,12 @@ def page3():
                                        molsPerRow=2, subImgSize=(500, 500), legends=smiles_list, returnPNG=False)
 
             # Save image to static folder
-            image_path = os.path.join('static', 'images', 'distribution.png')
+            image_path = os.path.join('static', 'images', 'smiles.png')
             img.save(image_path)
 
             message = f"Smiles Plot"
             return render_template('page3.html', message=message,
-                                   image_url=url_for('static', filename='images/distribution.png'))
+                                   image_url=url_for('static', filename='images/smiles.png'))
         except ValueError:
             return render_template('page3.html',
                                    message=message)

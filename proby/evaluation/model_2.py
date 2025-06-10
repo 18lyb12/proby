@@ -9,18 +9,22 @@ from proby.evaluation.util import plot_parity
 current_file_path = Path(__file__).resolve()
 root_folder_path = current_file_path.parents[1]
 processed_data_folder = os.path.join(root_folder_path, 'data/processed_data')
-
+test_full_path_template = os.path.join(processed_data_folder, 'model_2_test_full_{}.csv')
+test_smiles_path_template = os.path.join(processed_data_folder, 'model_2_test_smiles_{}.csv')
+test_preds_path_template = os.path.join(processed_data_folder, 'model_2_test_preds_{}.csv')
+test_preds_full_path_template = os.path.join(processed_data_folder, 'model_2_test_preds_full_{}.csv')
+save_dir_template = os.path.join(root_folder_path, 'models/model_2/{}')
 
 def prediction():
     for target in ['abs', 'emi', 'plqy', 'e', 'log10e', 'lifetime', 'abs fwhm (cm-1)', 'emi fwhm (cm-1)',
                    'abs fwhm (nm)', 'emi fwhm (nm)']:
         print(f"========================= start {target} =========================")
-        test_full_path = os.path.join(processed_data_folder, f'model_2_test_full_{target}.csv')  # required input file
-        test_smiles_path = os.path.join(processed_data_folder, f'model_2_test_smiles_{target}.csv')
-        test_preds_path = os.path.join(processed_data_folder, f'model_2_test_preds_{target}.csv')
-        test_preds_full_path = os.path.join(processed_data_folder, f'model_2_test_preds_full_{target}.csv')
+        test_full_path = test_full_path_template.format(target)  # required input file
+        test_smiles_path = test_smiles_path_template.format(target)
+        test_preds_path = test_preds_path_template.format(target)
+        test_preds_full_path = test_preds_full_path_template.format(target)
 
-        save_dir = os.path.join(root_folder_path, 'models/model_2', target)
+        save_dir = save_dir_template.format(target)
 
         test_df = pd.read_csv(test_full_path)
         test_df[["smiles", "solvent"]].to_csv(test_smiles_path, index=False, encoding='utf-8-sig')

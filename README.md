@@ -65,27 +65,22 @@ There will be 3 pages:
 
 #### Page 1: Predict Smiles from Files
 
-  You have option to select Method 1 or Method 2, and upload multiple ".xlsx" or ".csv" files with `SMILES` column (case-insensitive). Find the sample data in `proby/data/app_sample_data`. This process will end up generating the prediction data.
+  You can upload multiple ".xlsx" or ".csv" files with `SMILES` column (case-insensitive). Find the sample data in `proby/data/app_sample_data`. This process will end up generating the prediction data.
   - Step 1: Generate Model 1 prediction data input. `SMILES` column is given from input data. We cross join the input data with N most common (absorption, emission) pairs which is derived by PubChem dataset, Sci. Data dataset, and manually collected dataset.
   - Step 2. Run Model 1 to get prediction data.
   - Step 3: Group by SMILES. Each SMILES will have N predictions on different (absorption, emission) pairs, we pick the maximum prediction score as the prediction score for the certain SMILES. Select the SMILES whose scores are above the threshold (default = 0.95).
   - Step 4: Run Model 2 to get prediction data.
   - Step 5: Once the process is done. You can find the prediction data in 2 ways:
     - Refresh the page and download the prediction data  from the web page.
-    - Find the data in `proby/data/prediction_data/method1_output`.
+    - Find the data in `proby/data/prediction_data/output`.
 
 #### Page 2: Identify Substructures
 
-
-  We leverage [**chemprop**](https://github.com/chemprop/chemprop)'s interpret method to predict the substructure.
-
+  This page informs users about our capability to identify molecular substructures using [**chemprop**](https://github.com/chemprop/chemprop-v1-old-branches)'s interpret method. Direct predictions are currently disabled in the UI; please contact the listed emails for assistance.
 
 #### Page 3: Display SMILES
 
   Display multiple SMILES.
-
-
-
 
 ## Acknowledgements
 
