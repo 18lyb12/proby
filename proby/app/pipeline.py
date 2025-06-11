@@ -32,6 +32,7 @@ os.makedirs(intermediate_data_folder, exist_ok=True)
 # model 1
 model_1_data_path = os.path.join(intermediate_data_folder, 'model_1_data.csv')
 model_1_features_path = os.path.join(intermediate_data_folder, 'model_1_features.csv')
+model_1_preds_path = os.path.join(intermediate_data_folder, 'model_1_preds.csv')
 # model 2
 model_2_data_path = os.path.join(intermediate_data_folder, 'model_2_data.csv')
 model_2_preds_path_template = os.path.join(intermediate_data_folder, 'model_2_preds_{}.csv')
@@ -39,10 +40,6 @@ model_2_preds_path_template = os.path.join(intermediate_data_folder, 'model_2_pr
 # output
 output_data_folder = os.path.join(root_folder_path, "../data/prediction_data/output")
 os.makedirs(output_data_folder, exist_ok=True)
-# model 1
-model_1_preds_path = os.path.join(output_data_folder, 'model_1_preds.csv')
-# model 2
-model_2_preds_path = os.path.join(output_data_folder, 'model_2_preds.csv')
 
 # comprehensive prediction
 comprehensive_folder = os.path.join(output_data_folder, "comprehensive")
