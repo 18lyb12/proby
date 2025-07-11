@@ -88,7 +88,13 @@ We also build a simple application.
 ### Command
 - Ensure you are in the `proby` directory.
 - Run the command `python app.py`.
-- Open your browser and go to http://127.0.0.1:5000/ to see the local web page.
+- You should see a message similar to:
+  ```
+   * Serving Flask app 'app'
+   * Debug mode: on
+   * Running on http://127.0.0.1:5000
+  ```
+- Click the link (usually http://127.0.0.1:5000), or copy and paste it into your preferred browser. You will see the local web page in your browser.
 
 ### Description
 

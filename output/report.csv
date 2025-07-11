@@ -1,5 +1,0 @@
-file_name,input_smiles,model_1_reported_smiles,model_1_reported_positive_smiles,model_1_reported_negative_smiles,model_1_not_reported_smiles,model_1_not_reported_positive_smiles,model_1_not_reported_negative_smiles,model_2_candidates_pairs,model_2_property_reported_pairs,model_2_property_not_reported_pairs
-sample_data.xlsx,11,0,0,0,11,1,10,26,0,26
-sample_data_copy.xlsx,11,0,0,0,11,1,10,26,0,26
-sample_data copy.xlsx,11,0,0,0,11,1,10,26,0,26
-all,11,0,0,0,11,1,10,26,0,26
