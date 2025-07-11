@@ -1,13 +1,16 @@
-import chemprop
+import argparse
 import os
-import pandas as pd
 import shutil
 import threading
 import time
 from functools import reduce
 from pathlib import Path
 
-from proby.app.util import get_smiles, load_data, shared_logger, PredictionWithProgress, plot_proby_logo
+import chemprop
+import pandas as pd
+
+from proby.app.util import get_smiles, load_data, shared_logger, PredictionWithProgress, plot_proby_logo, \
+    delete_files_in_folder
 
 # Get the absolute path of the directory containing the current file
 current_file_path = Path(__file__).resolve()
@@ -136,7 +139,7 @@ def model_2(metadata):
 
     model_2_preds_df_list = []
     for target in ['abs', 'emi', 'plqy', 'e', 'log10e', 'lifetime', 'abs fwhm (cm-1)', 'emi fwhm (cm-1)', 'abs fwhm (nm)', 'emi fwhm (nm)']:
-        print(f"========================== start to predict {target} ==========================")
+        shared_logger.log(f"========================== start to predict {target} ==========================")
         model_2_each_property_preds_df = predict_model_2(test_path=model_2_data_path,
                                                          preds_path_template=model_2_preds_path_template,
                                                          target=target)
@@ -466,3 +469,43 @@ def predict_model_2(test_path, preds_path_template, target):
     df = pd.read_csv(preds_path)
     df = df[~df.apply(lambda row: row.eq('Invalid SMILES').any(), axis=1)]
     return df
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Run pipeline with input file.")
+    parser.add_argument('--file', default="", help='Path to the input file')
+    parser.add_argument('--folder', default="", help='Path to a folder containing input files')
+    args = parser.parse_args()
+
+    input_folder = "input"
+    # If --folder is provided and not empty, move all files in the folder to input folder
+    if args.folder:
+        delete_files_in_folder(input_folder)
+        for filename in os.listdir(args.folder):
+            src_path = os.path.join(args.folder, filename)
+            if os.path.isfile(src_path):
+                dest_path = os.path.join(input_folder, filename)
+                shutil.copy(src_path, dest_path)
+    # If --file is provided and not empty, move the single file to input folder
+    elif args.file:
+        delete_files_in_folder(input_folder)
+        input_file_path = args.file
+        filename = os.path.basename(input_file_path)
+        dest_path = os.path.join(input_folder, filename)
+        shutil.copy(input_file_path, dest_path)
+    # If neither is provided, use the default input folder
+    else:
+        pass
+
+    # Prepare metadata as expected by process_files
+    metadata = {
+        "input_data_folder": input_folder,
+        "app_output_data_folder": "output"
+    }
+
+    # Call the process_files method
+    process_files(metadata)
+
+
+if __name__ == "__main__":
+    main()

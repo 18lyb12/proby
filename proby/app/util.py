@@ -23,6 +23,7 @@ class SharedLogger:
         self.log_messages = deque(maxlen=max_size)
 
     def log(self, message):
+        print(message)
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         log_entry = f'{timestamp} - {message}'
         self.log_messages.append(log_entry)
