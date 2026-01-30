@@ -2,7 +2,7 @@
 
 <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white"></a>
 
-Children’s Hospital of Chongqing Medical University, Stanford University, Harvard University
+[Journal Link](https://advanced.onlinelibrary.wiley.com/doi/10.1002/advs.202515604)
 
 ## Installation
 
@@ -130,3 +130,18 @@ The project was built on many amazing open-source repositories: [chemprop](https
 
 ## License
 proby is made available under the GPLv3 License and is available for non-commercial academic purposes. 
+
+### Citation
+Please use below to cite this [paper](https://advanced.onlinelibrary.wiley.com/doi/10.1002/advs.202515604) if you find our work useful in your research.
+```
+
+@article{jiang2025ai,
+  title={AI-Driven Acceleration of Fluorescence Probe Discovery},
+  author={Jiang, Xuefeng and Li, Yanbo and Tian, Xue and Yang, Sen and Luo, Ruina and Zhou, Cenxing and Liu, Yuxuan and Hu, Jingying and Feng, Sen and Gan, Lu and others},
+  journal={Advanced Science},
+  pages={e15604},
+  year={2025},
+  publisher={Wiley Online Library}
+}
+
+```
