@@ -9,15 +9,16 @@ from proby.evaluation.util import plot_parity
 current_file_path = Path(__file__).resolve()
 root_folder_path = current_file_path.parents[1]
 processed_data_folder = os.path.join(root_folder_path, 'data/processed_data')
-test_full_path_template = os.path.join(processed_data_folder, 'model_2_test_full_{}.csv')
+test_full_path_template = os.path.join(processed_data_folder, 'model_2_test_full_{}.csv')  # required input file
 test_smiles_path_template = os.path.join(processed_data_folder, 'model_2_test_smiles_{}.csv')
 test_preds_path_template = os.path.join(processed_data_folder, 'model_2_test_preds_{}.csv')
 test_preds_full_path_template = os.path.join(processed_data_folder, 'model_2_test_preds_full_{}.csv')
 save_dir_template = os.path.join(root_folder_path, 'models/model_2/{}')
 
+target_list = ['abs', 'emi', 'plqy', 'log10e', 'lifetime', 'abs fwhm (nm)', 'emi fwhm (nm)']
+
 def prediction():
-    for target in ['abs', 'emi', 'plqy', 'e', 'log10e', 'lifetime', 'abs fwhm (cm-1)', 'emi fwhm (cm-1)',
-                   'abs fwhm (nm)', 'emi fwhm (nm)']:
+    for target in target_list:
         print(f"========================= start {target} =========================")
         test_full_path = test_full_path_template.format(target)  # required input file
         test_smiles_path = test_smiles_path_template.format(target)
@@ -48,28 +49,20 @@ def prediction():
 
 
 def main():
+    # generate predictions
     prediction()
-    for target in ['abs', 'emi', 'plqy', 'e', 'log10e', 'lifetime', 'abs fwhm (cm-1)', 'emi fwhm (cm-1)',
-                   'abs fwhm (nm)', 'emi fwhm (nm)']:
+    
+    # plot parity plots
+    for target in target_list:
         test_preds_full_path = os.path.join(processed_data_folder, f'model_2_test_preds_full_{target}.csv')
         df = pd.read_csv(test_preds_full_path)
         sub_df = df[[target, f"Pred {target}"]].dropna()
 
-        if target == "e":
-            sub_df = sub_df[~(sub_df[target] < 100)]
-        elif target == "log10e":
+        if target == "log10e":
             sub_df = sub_df[~(sub_df[target] < 2)]
 
         fig_path = os.path.join(processed_data_folder, f"model_2 {target} parity plot.png")
         plot_parity(sub_df[target], sub_df[f"Pred {target}"], label=target, fig_path=fig_path)
-
-        if target == "e":
-            sub_df[f'log10_{target}'] = np.log10(sub_df[target]).replace([np.inf, -np.inf], np.nan)
-            sub_df[f'Pred log10_{target}'] = np.log10(sub_df[f"Pred {target}"]).replace([np.inf, -np.inf], np.nan)
-            sub_df.dropna(inplace=True)
-            fig_path = os.path.join(processed_data_folder, f"model_2 log10({target}) parity plot.png")
-            plot_parity(sub_df[f'log10_{target}'], sub_df[f"Pred log10_{target}"], label=f'log10_{target}',
-                        fig_path=fig_path)
 
 
 if __name__ == "__main__":

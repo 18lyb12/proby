@@ -86,10 +86,9 @@ def plot_parity(y_true, y_pred, y_pred_unc=None, label="", fig_path=""):
     axmax = max(max(y_true), max(y_pred)) + 0.1 * (max(y_true) - min(y_true))
 
     mae = mean_absolute_error(y_true, y_pred)
-    rmse = mean_squared_error(y_true, y_pred, squared=False)
     r2 = r2_score(y_true, y_pred)
 
-    metrics = f"data size = {len(y_true)}\nMAE = {mae:.2f}\nRMSE = {rmse:.2f}\nR^2 = {r2:.2f}"
+    metrics = f"data size = {len(y_true)}\nMAE = {mae:.2f}\nR^2 = {r2:.2f}"
     print(f"{label}\n{metrics}")
 
     plt.figure()
@@ -103,7 +102,9 @@ def plot_parity(y_true, y_pred, y_pred_unc=None, label="", fig_path=""):
     ax = plt.gca()
     ax.set_aspect('equal')
 
-    at = AnchoredText(metrics, prop=dict(size=10), frameon=True, loc='upper left')
+    at = AnchoredText(
+        rf"$MAE = {mae:.2f}$" + "\n" + rf"$R^2 = {r2:.2f}$",
+        prop=dict(size=12), frameon=True, loc='upper left')
     at.patch.set_boxstyle("round,pad=0.,rounding_size=0.2")
     ax.add_artist(at)
 

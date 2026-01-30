@@ -43,7 +43,10 @@ def prediction():
 
 
 def main():
+    # generate predictions
     prediction()
+    
+    # evaluate classification performance
     df = pd.read_csv(test_preds_full_path)
     classification_evaluation_summary(df['true_category'], df['pred_category'],
                                       roc_fig_path=os.path.join(processed_data_folder, "model_1_ROC.png"),
