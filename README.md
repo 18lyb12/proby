@@ -4,6 +4,9 @@
 
 [Journal Link](https://advanced.onlinelibrary.wiley.com/doi/10.1002/advs.202515604)
 
+
+Fluorescence imaging probes are indispensable tools for clinical navigation and preclinical research. However, the discovery of target-specific probes is hampered by the scarcity of targetable fluorophore scaffolds, making the development process slow, costly, and heavily reliant on trial-and-error design. Here, we present a hybrid strategy that integrates AI with bioassays to accelerate the development of target-specific fluorescent probes. We developed an AI model (PROBY) based on over one million molecule entries from nine datasets, capable of identifying fluorescent molecules and predicting seven key photophysical properties. Applying PROBY to a library of 26,416 target-validated molecules, we identified thousands of candidates with both target affinity and favorable optical characteristics. Focusing on three clinically relevant targets (tau, BCL-2, and TDP-43), we validated AI-identified candidates and discovered PE859, obatoclax, and B3, which supported applications in spectral analysis, drug screening, pathological labeling, cell imaging, and ex vivo tumor imaging. Guided by PROBY, we chemically modify PE859, yielding two optimized derivatives (859-1 and 859-2). With improved photophysical properties, 859-2 enabled in vivo two-photon imaging of tau pathology in transgenic mice. This hybrid AI-bioassay strategy substantially broadens the accessible scaffold landscape for designing target-specific fluorescence probes and provides a scalable, efficient, and cost-effective framework for next-generation probe discovery.
+
 ## Installation
 
 First clone the repo and cd into the directory:
@@ -126,7 +129,7 @@ The project was built on many amazing open-source repositories: [chemprop](https
 
 
 ## Issues
-- Please open new threads or address all questions to xiyue.wang.scu@gmail.com, xiyuew@stanford.edu or biyuezhu@hospital.cqmu.edu.cn. 
+- Please open new threads or address all questions to xiyue.wang.scu@gmail.com or biyuezhu@hospital.cqmu.edu.cn. 
 
 ## License
 proby is made available under the GPLv3 License and is available for non-commercial academic purposes. 
