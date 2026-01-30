@@ -129,7 +129,7 @@ The project was built on many amazing open-source repositories: [chemprop](https
 
 
 ## Issues
-- Please open new threads or address all questions to xiyue.wang.scu@gmail.com or biyuezhu@hospital.cqmu.edu.cn. 
+- Please open new threads or address all questions to biyuezhu@hospital.cqmu.edu.cn or  xiyue.wang.scu@gmail.com. 
 
 ## License
 proby is made available under the GPLv3 License and is available for non-commercial academic purposes. 
